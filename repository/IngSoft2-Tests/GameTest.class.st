@@ -1349,58 +1349,30 @@ GameTest >> test53APlayerLandsOnAJailSquareAndGetsLockedUpAndTwoTurnsLaterRollsT
 { #category : #tests }
 GameTest >> test54 [
 
-	| tmp1 tmp2 tmp3 tmp4 tmp5 tmp6 tmp7 tmp8 tmp9 tmp10 |
-	self
-		generatePlayerNames: #( 'Fran' 'Martu' 'Maia' );
-		generateDeterministicDiceCupWithSequences:
-			#( #( 6 5 5 3 5 5 6 ) #( 6 5 5 3 5 5 6 ) ).
-	tmp5 := OrderedCollection newFrom: { 
-			        OverloadCard new.
-			        SpeedCard new.
-			        AccelerationCard new.
-			        RedoCard new.
-			        RedoCard new.
-			        RepeatCard new }.
-	self generateDeterministicDeckWith: tmp5.
-	tmp6 := OrderedCollection newFrom:
-		        { (EffectProbability of: JailedEffect new with: 1) }.
-	tmp7 := EffectShuffler ofSize: 40 withGiven: tmp6 copy.
-	tmp8 := tmp7 generate.
-	tmp2 := Board
-		        having: tmp8
-		        requiring: 1
-		        playingWith: deterministicDeck
-		        usedBy: players
-		        throwing: diceCup.
-	tmp3 := GameMandM playedOn: tmp2.
-	tmp4 := Dictionary newFrom: { 
-			        ('Fran' -> 1).
-			        ('Martu' -> 1).
-			        ('Maia' -> 1) }.
-	self assert: tmp3 playerPositions equals: tmp4.
-	tmp9 := tmp5 at: 2.
-	tmp10 := tmp9 asPlayAffecting: 'Fran' by: tmp3 currentPlayerThrowing.
-	tmp3 make: tmp10.
-	self throwDiceCupTimes: 3 in: tmp3.
-	tmp4 := Dictionary newFrom: { 
-			        ('Fran' -> 14).
-			        ('Martu' -> 11).
-			        ('Maia' -> 11) }.
-	self
-		assert: tmp3 playerPositions equals: tmp4;
-		throwDiceCupTimes: 3 in: tmp3.
-	tmp4 := Dictionary newFrom: { 
-			        ('Fran' -> 14).
-			        ('Martu' -> 11).
-			        ('Maia' -> 11) }.
-	self
-		assert: tmp3 playerPositions equals: tmp4;
-		throwDiceCupTimes: 3 in: tmp3.
-	tmp4 := Dictionary newFrom: { 
-			        ('Fran' -> 27).
-			        ('Martu' -> 11).
-			        ('Maia' -> 11) }.
-	self assert: tmp3 playerPositions equals: tmp4
+	| cards effectsDistribution effectShuffler squares aBoard aGame playerPositions speedCard aPlay |
+	self generatePlayerNames: #( 'Fran' 'Martu' 'Maia' ).
+	self generateDeterministicDiceCupWithSequences: #( #( 6 5 5 3 5 5 6 5 5) #( 6 5 5 3 5 5 6 5 5) ).
+	cards := OrderedCollection newFrom: {  OverloadCard new. SpeedCard new. AccelerationCard new. RedoCard new. RedoCard new. RepeatCard new }.
+	self generateDeterministicDeckWith: cards.
+	effectsDistribution := OrderedCollection newFrom: { (EffectProbability of: JailedEffect new with: 1) }.
+	effectShuffler := EffectShuffler ofSize: 40 withGiven: effectsDistribution copy.
+	squares := effectShuffler generate.
+	aBoard := Board having: squares requiring: 1 playingWith: deterministicDeck usedBy: players throwing: diceCup.
+	aGame := GameMandM playedOn: aBoard.
+	playerPositions := Dictionary newFrom: { ('Fran' -> 1). ('Martu' -> 1). ('Maia' -> 1) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	speedCard := cards at: 2.
+	aPlay := speedCard asPlayAffecting: 'Fran' by: aGame currentPlayerThrowing.
+	aGame make: aPlay.
+	self throwDiceCupTimes: 3 in: aGame.
+	playerPositions := Dictionary newFrom: { ('Fran' -> 14). ('Martu' -> 11). ('Maia' -> 11) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 3 in: aGame.
+	playerPositions := Dictionary newFrom: {  ('Fran' -> 14). ('Martu' -> 11). ('Maia' -> 11) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 3 in: aGame.
+	playerPositions := Dictionary newFrom: {  ('Fran' -> 27). ('Martu' -> 11). ('Maia' -> 11) }.
+	self assert: aGame playerPositions equals: playerPositions
 ]
 
 { #category : #iteration }
