@@ -9,19 +9,20 @@ Class {
 		'positionTracker',
 		'laps',
 		'lastAppliedEffect',
-		'cardHandler'
+		'cardHandler',
+		'diceCup'
 	],
 	#category : #'IngSoft2-Model'
 }
 
 { #category : #'instance creation' }
-Board class >> having: squares requiring: aNumberOfLaps playingWith: aDeck usedBy: aGroupOfPlayers [
+Board class >> having: squares requiring: aNumberOfLaps playingWith: aDeck usedBy: aGroupOfPlayers throwing: aDiceCup [
 	self validateMoreThanEightSquares: squares.
 	self validatesItDoesntHavePlayersWithSameName: aGroupOfPlayers.
 	self validatesNamesMustHaveAtLeastOneLetter: aGroupOfPlayers.
 	self validatesItMustHaveAtLeastOnePlayer: aGroupOfPlayers.
 	self validatesItNeedsAtLeastOneLap: aNumberOfLaps.  
-	^self new initializeHaving: squares requiring: aNumberOfLaps containing: aDeck usedBy: aGroupOfPlayers  
+	^self new initializeHaving: squares requiring: aNumberOfLaps containing: aDeck usedBy: aGroupOfPlayers throwing: aDiceCup. 
 ]
 
 { #category : #validation }
@@ -68,6 +69,19 @@ Board >> activeCards [
 ]
 
 { #category : #accessing }
+Board >> addedEffectValues [
+
+	| currentPlayer activePlays applicablePlays valueOfEffects sumOfValues |
+	
+	activePlays := cardHandler activePlays.
+	currentPlayer := self currentPlayerThrowing.
+	applicablePlays := activePlays select: [ :play | (play target) includes: currentPlayer ].
+	valueOfEffects := applicablePlays collect: [ :play | (play card) applyTo: self directedTo: currentPlayer ]. 
+	sumOfValues := valueOfEffects inject: 0 into: [:sum :each | sum + each ].
+	^ sumOfValues.
+]
+
+{ #category : #accessing }
 Board >> amountOfLaps [
 	^ laps
 ]
@@ -75,17 +89,6 @@ Board >> amountOfLaps [
 { #category : #accessing }
 Board >> amountOfPlayers [
 	^ players size
-]
-
-{ #category : #action }
-Board >> applyActiveCards [
-
-	| currentPlayer activePlays applicablePlays |
-	
-	activePlays := cardHandler activePlays.
-	currentPlayer := self currentPlayerThrowing.
-	applicablePlays := activePlays select: [ :play | (play target) includes: currentPlayer ].
-	applicablePlays do: [ :play | self disableEffectsDuring: [ (play card) applyTo: self directedTo: currentPlayer ] ]
 ]
 
 { #category : #action }
@@ -148,8 +151,7 @@ Board >> handleInstantaeousCardFrom: newPlay [
 { #category : #action }
 Board >> handlePermanentCardFrom: newPlay [
 	self currentPlayerThrowing ~= newPlay invokingPlayer
-		ifTrue: [ Error
-				signal: 'A permanent card can only played in the turn of the invoking player' ]
+		ifTrue: [ Error signal: 'A permanent card can only played in the turn of the invoking player' ]
 		ifFalse: [ cardHandler activate: newPlay ]
 ]
 
@@ -159,16 +161,28 @@ Board >> incrementTurn [
 ]
 
 { #category : #initialization }
-Board >> initializeHaving: boardSquares requiring: aNumberOfLaps containing: aDeck usedBy: aGroupOfPlayers [  
+Board >> initializeHaving: boardSquares requiring: aNumberOfLaps containing: aDeck usedBy: aGroupOfPlayers throwing: aDiceCup [  
 	
 	players := aGroupOfPlayers.
 	size := boardSquares size.
 	turn := 1.
 	squares := boardSquares.
 	laps := aNumberOfLaps.
+	diceCup := aDiceCup.
 	positionTracker := PositionsTracker of: aGroupOfPlayers inBoardOf: size.
 	cardHandler := CardHandler using: aDeck dealsTo: aGroupOfPlayers.
 	lastAppliedEffect := NoEffect new
+]
+
+{ #category : #accessing }
+Board >> isLockedUp: aPlayer [
+
+	^ positionTracker isLockedUp: aPlayer.
+]
+
+{ #category : #action }
+Board >> lockUp: aPlayer [
+	positionTracker lockUp: aPlayer.
 ]
 
 { #category : #action }
@@ -212,13 +226,15 @@ Board >> movePlayersBack: aNumberOfSpaces except: aPlayer [
 ]
 
 { #category : #action }
-Board >> nextPlayerThrows: resultOfThrow in: aGame [ 
-	
-	| player |
-	
+Board >> nextPlayerThrowsIn: aGame [
+
+	| player resultOfThrow |
 	player := players at: turn.
-	self move: player by: resultOfThrow.
-	self applyActiveCards.
+	resultOfThrow := diceCup throw.
+	((self isLockedUp: player) and: (diceCup maxThrow = resultOfThrow )) ifTrue: [ self unlock: player ].
+	(self isLockedUp: player) ifFalse: [
+		"self applyActiveCards."
+		self move: player by: resultOfThrow + (self addedEffectValues) .].
 	self verifyThereIsAWinner ifTrue: [ aGame isNotifiedItHasFinished ] ifFalse: [ self incrementTurn ]
 ]
 
@@ -265,6 +281,11 @@ Board >> resolvePlayabilityOf: newPlay [
 { #category : #accessing }
 Board >> size [
 	^ size
+]
+
+{ #category : #action }
+Board >> unlock: aPlayer [
+	positionTracker unlock: aPlayer.
 ]
 
 { #category : #action }

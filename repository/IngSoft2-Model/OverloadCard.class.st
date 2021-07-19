@@ -6,7 +6,8 @@ Class {
 
 { #category : #action }
 OverloadCard >> applyTo: aBoard directedTo: aTarget [
-	aBoard move: aTarget by: -2
+	"aBoard move: aTarget by: -2"
+	^ -2.
 ]
 
 { #category : #'instance creation' }

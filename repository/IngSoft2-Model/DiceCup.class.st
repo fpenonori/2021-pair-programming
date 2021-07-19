@@ -34,6 +34,15 @@ DiceCup >> initializeContaining: diceSet [
 	dice := diceSet
 ]
 
+{ #category : #accessing }
+DiceCup >> maxThrow [ 
+	| maxDiceValue maxThrow |
+	
+	maxDiceValue := dice collect: [ :die | die max ].
+	maxThrow := maxDiceValue inject: 0 into: [:sum :each | sum + each ].
+	^ maxThrow.
+]
+
 { #category : #action }
 DiceCup >> throw [
 	^ dice sumNumbers: [ :die | die throw ]

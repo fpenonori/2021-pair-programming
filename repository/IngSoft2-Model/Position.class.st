@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'name',
 		'square',
-		'laps'
+		'laps',
+		'locked'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -39,7 +40,27 @@ Position >> initializeOf: playerName at: squareNumber in: lapNumber [
 
 	name := playerName.
 	square := squareNumber.
-	laps := lapNumber
+	laps := lapNumber.
+	locked := false.
 
+]
 
+{ #category : #accessing }
+Position >> isLockedUp [ 
+	^ locked.
+]
+
+{ #category : #action }
+Position >> lockUp [
+	locked := true.
+]
+
+{ #category : #accessing }
+Position >> player [
+	^ name.
+]
+
+{ #category : #action }
+Position >> unlock [
+	locked := false.
 ]

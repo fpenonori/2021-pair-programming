@@ -71,6 +71,22 @@ PositionsTracker >> initializeOf: aGroupOfPlayers inBoardOf: size [
 ]
 
 { #category : #accessing }
+PositionsTracker >> isLockedUp: aPlayer [
+
+	| playerPosition |
+	
+	playerPosition := playerPositions detect: [ :position | position player = aPlayer ].
+	^ playerPosition isLockedUp.
+]
+
+{ #category : #action }
+PositionsTracker >> lockUp: aPlayer [
+	| playerPosition |
+	playerPosition := playerPositions detect: [ :position | position player = aPlayer ].
+	playerPosition lockUp.
+]
+
+{ #category : #accessing }
 PositionsTracker >> playerLaps [
 
 	| playerLaps playerNames laps |
@@ -89,6 +105,13 @@ PositionsTracker >> playerRanking [
 	playerRanking := playerPositions sort: [ :positionOne :positionTwo | positionOne > positionTwo ].
 	playerRankingNames := playerRanking collect: [ :position | position currentPlayer ].
 	^ playerRankingNames
+]
+
+{ #category : #action }
+PositionsTracker >> unlock: aPlayer [
+	| playerPosition |
+	playerPosition := playerPositions detect: [ :position | position player = aPlayer ].
+	playerPosition unlock.
 ]
 
 { #category : #action }
