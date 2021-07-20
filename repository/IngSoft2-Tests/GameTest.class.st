@@ -1347,11 +1347,11 @@ GameTest >> test53APlayerLandsOnAJailSquareAndGetsLockedUpAndTwoTurnsLaterRollsT
 ]
 
 { #category : #tests }
-GameTest >> test54 [
+GameTest >> test54AllPlayersLandOnOnJailSquaresButOnlyPlayerFranThrowsTheMaxValueAndGetsOut [
 
 	| cards effectsDistribution effectShuffler squares aBoard aGame playerPositions speedCard aPlay |
 	self generatePlayerNames: #( 'Fran' 'Martu' 'Maia' ).
-	self generateDeterministicDiceCupWithSequences: #( #( 6 5 5 3 5 5 6 5 5) #( 6 5 5 3 5 5 6 5 5) ).
+	self generateDeterministicDiceCupWithSequences: #(#( 6 5 5 3 5 5 6 5 5 ) #( 6 5 5 3 5 5 6 5 5 )).
 	cards := OrderedCollection newFrom: {  OverloadCard new. SpeedCard new. AccelerationCard new. RedoCard new. RedoCard new. RepeatCard new }.
 	self generateDeterministicDeckWith: cards.
 	effectsDistribution := OrderedCollection newFrom: { (EffectProbability of: JailedEffect new with: 1) }.
@@ -1373,6 +1373,203 @@ GameTest >> test54 [
 	self throwDiceCupTimes: 3 in: aGame.
 	playerPositions := Dictionary newFrom: {  ('Fran' -> 27). ('Martu' -> 11). ('Maia' -> 11) }.
 	self assert: aGame playerPositions equals: playerPositions
+]
+
+{ #category : #tests }
+GameTest >> test55AnotherPlayerLandingOnAMoonWalkSquareDoesntAffectAPlayerThatHasLandedOnAJailSquare [
+
+	| cards squares aBoard aGame playerPositions |
+	self generatePlayerNames: #( 'Fran' 'Martu' 'Maia' ).
+	self generateDeterministicDiceCupWithSequences: #(#( 2 4 3 ) #( 2 4 3 )).
+	cards := OrderedCollection newFrom: {  OverloadCard new. SpeedCard new. AccelerationCard new. RedoCard new. RedoCard new. RepeatCard new }.
+	self generateDeterministicDeckWith: cards.
+	squares := OrderedCollection newFrom: { BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (JailedEffect new) . BoardSquare applying: (NoEffect new) . BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new) . BoardSquare applying: (MoonWalkEffect goingBack: 2) . BoardSquare applying: (AtomicBombEffect new). BoardSquare applying: (NoEffect new) }.
+	aBoard := Board having: squares requiring: 1 playingWith: deterministicDeck usedBy: players throwing: diceCup.
+	aGame := GameMandM playedOn: aBoard.
+	playerPositions := Dictionary newFrom: { ('Fran' -> 1). ('Martu' -> 1). ('Maia' -> 1) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 1 in: aGame.
+	playerPositions := Dictionary newFrom: { ('Fran' -> 5). ('Martu' -> 1). ('Maia' -> 1) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 1 in: aGame.
+	playerPositions := Dictionary newFrom: {  ('Fran' -> 5). ('Martu' -> 9). ('Maia' -> 1) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 1 in: aGame.
+	playerPositions := Dictionary newFrom: {  ('Fran' -> 5). ('Martu' -> 9). ('Maia' -> 7) }.
+	self assert: aGame playerPositions equals: playerPositions
+]
+
+{ #category : #tests }
+GameTest >> test56AnotherPlayerLandingOnAnAtomicBombSquareDoesntAffectAPlayerThatHasLandedOnAJailSquare [
+
+	| cards squares aBoard aGame playerPositions |
+	self generatePlayerNames: #( 'Fran' 'Martu' 'Maia' ).
+	self generateDeterministicDiceCupWithSequences: #(#( 2 3 5 ) #( 2 3 4 )).
+	cards := OrderedCollection newFrom: {  OverloadCard new. SpeedCard new. AccelerationCard new. RedoCard new. RedoCard new. RepeatCard new }.
+	self generateDeterministicDeckWith: cards.
+	squares := OrderedCollection newFrom: { BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (JailedEffect new) . BoardSquare applying: (NoEffect new) . BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new) . BoardSquare applying: (MoonWalkEffect goingBack: 2) . BoardSquare applying: (AtomicBombEffect new). BoardSquare applying: (NoEffect new) }.
+	aBoard := Board having: squares requiring: 1 playingWith: deterministicDeck usedBy: players throwing: diceCup.
+	aGame := GameMandM playedOn: aBoard.
+	playerPositions := Dictionary newFrom: { ('Fran' -> 1). ('Martu' -> 1). ('Maia' -> 1) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 1 in: aGame.
+	playerPositions := Dictionary newFrom: { ('Fran' -> 5). ('Martu' -> 1). ('Maia' -> 1) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 1 in: aGame.
+	playerPositions := Dictionary newFrom: {  ('Fran' -> 5). ('Martu' -> 7). ('Maia' -> 1) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 1 in: aGame.
+	playerPositions := Dictionary newFrom: {  ('Fran' -> 5). ('Martu' -> 1). ('Maia' -> 1) }.
+	self assert: aGame playerPositions equals: playerPositions
+]
+
+{ #category : #tests }
+GameTest >> test57EffectsOfAnOverloadCardAreOnlyAppliedOnceThePlayerLeavesJail [
+	
+	| aBoard aGame playerPositions cards effectsDistribution effectShuffler squares anOverloadCard aPlay |
+	
+	self generatePlayerNames: #('Fran').
+	self generateDeterministicDiceCupWithSequences: #(#(6 3 6) #(6 3 6)).
+	cards := OrderedCollection newFrom: { OverloadCard new . SpeedCard new . AccelerationCard new . RedoCard new . RedoCard new . RepeatCard new }.
+	self generateDeterministicDeckWith: cards.
+	effectsDistribution := OrderedCollection newFrom: { EffectProbability of: (JailedEffect new) with: 1}.
+	effectShuffler := EffectShuffler ofSize: 30 withGiven: (effectsDistribution copy).
+	squares := effectShuffler generate.
+	aBoard := Board having: squares requiring: 1 playingWith: deterministicDeck usedBy: players throwing: diceCup.
+	aGame := GameMandM playedOn: aBoard.
+	playerPositions := Dictionary newFrom: {'Fran' ->1}.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 1 in: aGame.
+	playerPositions := Dictionary newFrom: {'Fran' ->13}.
+	self assert: aGame playerPositions equals: playerPositions.
+	anOverloadCard := cards at: 1.
+	aPlay := anOverloadCard 	asPlayAffecting: 'Fran' by: aGame currentPlayerThrowing.
+	aGame make: aPlay.
+	self throwDiceCupTimes: 2 in: aGame.
+	playerPositions := Dictionary newFrom: {'Fran' ->23}.
+	self assert: aGame playerPositions equals: playerPositions.
+]
+
+{ #category : #tests }
+GameTest >> test58EffectsOfAnAccelerationCardAreOnlyAppliedOnceThePlayerLeavesJail [
+	
+	| aBoard aGame playerPositions cards effectsDistribution effectShuffler squares aPlay anAccelerationCard |
+	
+	self generatePlayerNames: #('Fran' 'Martu').
+	self generateDeterministicDiceCupWithSequences: #(#(6 3 4 3 6) #(6 3 4 3 6)).
+	cards := OrderedCollection newFrom: { OverloadCard new . SpeedCard new . AccelerationCard new . RedoCard new . RedoCard new . RepeatCard new }.
+	self generateDeterministicDeckWith: cards.
+	effectsDistribution := OrderedCollection newFrom: { EffectProbability of: (JailedEffect new) with: 1}.
+	effectShuffler := EffectShuffler ofSize: 30 withGiven: (effectsDistribution copy).
+	squares := effectShuffler generate.
+	aBoard := Board having: squares requiring: 1 playingWith: deterministicDeck usedBy: players throwing: diceCup.
+	aGame := GameMandM playedOn: aBoard.
+	playerPositions := Dictionary newFrom: {'Fran' ->1 . 'Martu' -> 1}.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 1 in: aGame.
+	playerPositions := Dictionary newFrom: {'Fran' ->13 . 'Martu' -> 1}.
+	self assert: aGame playerPositions equals: playerPositions.
+	anAccelerationCard := cards at: 3.
+	aPlay := anAccelerationCard asPlayAffecting: aGame by: aGame currentPlayerThrowing.
+	aGame make: aPlay.
+	self throwDiceCupTimes: 1 in: aGame.
+	playerPositions := Dictionary newFrom: {'Fran' -> 13 . 'Martu' -> 8}.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 2 in: aGame.
+	playerPositions := Dictionary newFrom: {'Fran' -> 13 . 'Martu' -> 8}.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 1 in: aGame.
+	playerPositions := Dictionary newFrom: {'Fran' -> 26 . 'Martu' -> 8}.
+	self assert: aGame playerPositions equals: playerPositions.
+]
+
+{ #category : #tests }
+GameTest >> test59ApplyingARepeatCardOnASpeedUpEffectThatWouldMoveAJailedPlayerDoesntTakeEffect [
+
+	| cards squares aBoard aGame playerPositions aRepeatCard aPlay |
+	self generatePlayerNames: #( 'Fran' 'Martu' 'Maia' ).
+	self generateDeterministicDiceCupWithSequences: #(#( 2 3 4 ) #( 2 3 4 )).
+	cards := OrderedCollection newFrom: {  OverloadCard new. RepeatCard new. AccelerationCard new. RedoCard new. RedoCard new. SpeedCard new }.
+	self generateDeterministicDeckWith: cards.
+	squares := OrderedCollection newFrom: { BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (JailedEffect new) . BoardSquare applying: (NoEffect new) . BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new) . BoardSquare applying: (SpeedUpEffect new) . BoardSquare applying: (WormHoleEffect new). BoardSquare applying: (DrawCardEffect new) . BoardSquare applying: (NoEffect new) . BoardSquare applying: (NoEffect new) . BoardSquare applying: (NoEffect new) }.
+	aBoard := Board having: squares requiring: 1 playingWith: deterministicDeck usedBy: players throwing: diceCup.
+	aGame := GameMandM playedOn: aBoard.
+	playerPositions := Dictionary newFrom: { ('Fran' -> 1). ('Martu' -> 1). ('Maia' -> 1) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 1 in: aGame.
+	playerPositions := Dictionary newFrom: { ('Fran' -> 5). ('Martu' -> 1). ('Maia' -> 1) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 1 in: aGame.
+	playerPositions := Dictionary newFrom: {  ('Fran' -> 5). ('Martu' -> 7). ('Maia' -> 1) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 1 in: aGame.
+	playerPositions := Dictionary newFrom: {  ('Fran' -> 5). ('Martu' -> 7). ('Maia' -> 13) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	aRepeatCard := cards at: 2.
+	aPlay := aRepeatCard asPlayAffecting: 'Fran' by: aGame currentPlayerThrowing.
+	aGame make: aPlay.
+	playerPositions := Dictionary newFrom: {  ('Fran' -> 5). ('Martu' -> 7). ('Maia' -> 13) }.
+	self assert: aGame playerPositions equals: playerPositions.
+]
+
+{ #category : #tests }
+GameTest >> test60ApplyingARepeatCardOnAWormHoleEffectThatWouldMoveAJailedPlayerDoesntTakeEffect [
+	| cards squares aBoard aGame playerPositions aRepeatCard aPlay |
+	self generatePlayerNames: #( 'Fran' 'Martu' 'Maia' ).
+	self generateDeterministicDiceCupWithSequences: #(#( 2 3 4 ) #( 2 3 5 )).
+	cards := OrderedCollection newFrom: {  OverloadCard new. RepeatCard new. AccelerationCard new. RedoCard new. RedoCard new. SpeedCard new }.
+	self generateDeterministicDeckWith: cards.
+	squares := OrderedCollection newFrom: { BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (JailedEffect new) . BoardSquare applying: (NoEffect new) . BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new) . BoardSquare applying: (SpeedUpEffect new) . BoardSquare applying: (WormHoleEffect new). BoardSquare applying: (DrawCardEffect new) . BoardSquare applying: (NoEffect new) . BoardSquare applying: (NoEffect new) . BoardSquare applying: (NoEffect new) }.
+	aBoard := Board having: squares requiring: 1 playingWith: deterministicDeck usedBy: players throwing: diceCup.
+	aGame := GameMandM playedOn: aBoard.
+	playerPositions := Dictionary newFrom: { ('Fran' -> 1). ('Martu' -> 1). ('Maia' -> 1) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 1 in: aGame.
+	playerPositions := Dictionary newFrom: { ('Fran' -> 5). ('Martu' -> 1). ('Maia' -> 1) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 1 in: aGame.
+	playerPositions := Dictionary newFrom: {  ('Fran' -> 5). ('Martu' -> 7). ('Maia' -> 1) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 1 in: aGame.
+	playerPositions := Dictionary newFrom: {  ('Fran' -> 5). ('Martu' -> 7). ('Maia' -> 6) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	aRepeatCard := cards at: 2.
+	aPlay := aRepeatCard asPlayAffecting: 'Fran' by: aGame currentPlayerThrowing.
+	aGame make: aPlay.
+	playerPositions := Dictionary newFrom: {  ('Fran' -> 5). ('Martu' -> 7). ('Maia' -> 6) }.
+	self assert: aGame playerPositions equals: playerPositions.
+]
+
+{ #category : #tests }
+GameTest >> test61 [
+	| cards squares aBoard aGame playerPositions aRepeatCard aPlay handOfMaia handOfFran |
+	self generatePlayerNames: #( 'Fran' 'Martu' 'Maia' ).
+	self generateDeterministicDiceCupWithSequences: #(#( 2 3 5 ) #( 2 3 5 )).
+	cards := OrderedCollection newFrom: {  OverloadCard new. RepeatCard new. AccelerationCard new. RedoCard new. RedoCard new. SpeedCard new }.
+	self generateDeterministicDeckWith: cards.
+	squares := OrderedCollection newFrom: { BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (JailedEffect new) . BoardSquare applying: (NoEffect new) . BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new) . BoardSquare applying: (SpeedUpEffect new) . BoardSquare applying: (WormHoleEffect new). BoardSquare applying: (DrawCardEffect new) . BoardSquare applying: (NoEffect new) . BoardSquare applying: (NoEffect new) . BoardSquare applying: (NoEffect new) }.
+	aBoard := Board having: squares requiring: 1 playingWith: deterministicDeck usedBy: players throwing: diceCup.
+	aGame := GameMandM playedOn: aBoard.
+	playerPositions := Dictionary newFrom: { ('Fran' -> 1). ('Martu' -> 1). ('Maia' -> 1) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 1 in: aGame.
+	playerPositions := Dictionary newFrom: { ('Fran' -> 5). ('Martu' -> 1). ('Maia' -> 1) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 1 in: aGame.
+	playerPositions := Dictionary newFrom: {  ('Fran' -> 5). ('Martu' -> 7). ('Maia' -> 1) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	self throwDiceCupTimes: 1 in: aGame.
+	playerPositions := Dictionary newFrom: {  ('Fran' -> 5). ('Martu' -> 7). ('Maia' -> 11) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	handOfMaia := OrderedCollection newFrom: { cards at: 5 . cards at: 6 . cards at: 1 }.
+	self assert: (aGame handOf: 'Maia') equals: handOfMaia.
+	aRepeatCard := cards at: 2.
+	aPlay := aRepeatCard asPlayAffecting: 'Fran' by: aGame currentPlayerThrowing.
+	aGame make: aPlay.
+	playerPositions := Dictionary newFrom: {  ('Fran' -> 5). ('Martu' -> 7). ('Maia' -> 11) }.
+	self assert: aGame playerPositions equals: playerPositions.
+	handOfFran := OrderedCollection newFrom: { cards at: 1 }.
+	self assert: (aGame handOf: 'Fran') equals: handOfFran.
 ]
 
 { #category : #iteration }

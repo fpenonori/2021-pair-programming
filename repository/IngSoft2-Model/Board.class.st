@@ -208,10 +208,11 @@ Board >> move: player by: amountPlaces [
 { #category : #action }
 Board >> moveAllPlayersToFirstSquareOfTheirLap [
 
-	| relativePositions relativePlayerPosition |
+	| relativePositions relativePlayerPosition affectedPlayers |
 	
 	relativePositions := positionTracker boardPositions.
-	players do: [ :playerName |
+	affectedPlayers := players reject: [ :player | self isLockedUp: player ].
+	affectedPlayers do: [ :playerName |
 		relativePlayerPosition := relativePositions at: playerName.
 		self move: playerName by: ((relativePlayerPosition - 1) * (-1)). ]
 ]
@@ -221,7 +222,7 @@ Board >> movePlayersBack: aNumberOfSpaces except: aPlayer [
 	
 	| affectedPlayers |
 	
-	affectedPlayers := players reject: [ :player | player = aPlayer ].
+	affectedPlayers := players reject: [ :player | (player = aPlayer or: (self isLockedUp: player))].
 	affectedPlayers do: [ :player | self move: player by: (-1) * aNumberOfSpaces ]
 ]
 
