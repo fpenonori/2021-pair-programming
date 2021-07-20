@@ -6,7 +6,7 @@ Class {
 
 { #category : #action }
 RepeatCard >> applyTo: aBoard directedTo: aTarget [
-	aBoard applyRepeatCardTo: (aTarget target)
+	aBoard applyRepeatCardTo: (aTarget target). 
 	
 ]
 

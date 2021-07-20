@@ -6,7 +6,6 @@ Class {
 
 { #category : #action }
 OverloadCard >> applyTo: aBoard directedTo: aTarget [
-	"aBoard move: aTarget by: -2"
 	^ -2.
 ]
 

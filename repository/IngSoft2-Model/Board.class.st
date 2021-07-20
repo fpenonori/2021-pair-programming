@@ -156,6 +156,15 @@ Board >> handlePermanentCardFrom: newPlay [
 ]
 
 { #category : #action }
+Board >> handleUnlockWith: aPlay [
+	(self isLockedUp: aPlay target)
+		ifTrue: [ self unlock: aPlay target ]
+		ifFalse: [
+			cardHandler deal: (aPlay card) to: (aPlay invokingPlayer).
+			Error signal: 'Only jailed players can be targeted by the jailbreak card' ]
+]
+
+{ #category : #action }
 Board >> incrementTurn [
 	turn := (turn rem: players size) + 1
 ]
