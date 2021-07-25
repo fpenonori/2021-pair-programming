@@ -64,12 +64,7 @@ Board >> absoluteSize [
 ]
 
 { #category : #accessing }
-Board >> activeCards [
-	^ cardHandler activeCards
-]
-
-{ #category : #accessing }
-Board >> addedEffectValues [
+Board >> accumulatedCardEffectValues [
 
 	| currentPlayer activePlays applicablePlays valueOfEffects sumOfValues |
 	
@@ -79,6 +74,11 @@ Board >> addedEffectValues [
 	valueOfEffects := applicablePlays collect: [ :play | (play card) applyTo: self directedTo: currentPlayer ]. 
 	sumOfValues := valueOfEffects inject: 0 into: [:sum :each | sum + each ].
 	^ sumOfValues.
+]
+
+{ #category : #accessing }
+Board >> activeCards [
+	^ cardHandler activeCards
 ]
 
 { #category : #accessing }
@@ -128,6 +128,12 @@ Board >> currentPlayerThrowing [
 { #category : #action }
 Board >> dealsCardTo: aPlayer [
 	cardHandler dealsCardTo: aPlayer
+]
+
+{ #category : #action }
+Board >> decideUnlockingOf: player with: resultOfThrow [
+	((self isLockedUp: player) and: diceCup maxThrow = resultOfThrow)
+		ifTrue: [ self unlock: player ]
 ]
 
 { #category : #action }
@@ -237,14 +243,11 @@ Board >> movePlayersBack: aNumberOfSpaces except: aPlayer [
 
 { #category : #action }
 Board >> nextPlayerThrowsIn: aGame [
-
 	| player resultOfThrow |
 	player := players at: turn.
 	resultOfThrow := diceCup throw.
-	((self isLockedUp: player) and: (diceCup maxThrow = resultOfThrow )) ifTrue: [ self unlock: player ].
-	(self isLockedUp: player) ifFalse: [
-		"self applyActiveCards."
-		self move: player by: resultOfThrow + (self addedEffectValues) .].
+	self decideUnlockingOf: player with: resultOfThrow.
+	(self isLockedUp: player) ifFalse: [ self move: player by: resultOfThrow + self accumulatedCardEffectValues ].
 	self verifyThereIsAWinner ifTrue: [ aGame isNotifiedItHasFinished ] ifFalse: [ self incrementTurn ]
 ]
 

@@ -1383,7 +1383,7 @@ GameTest >> test55AnotherPlayerLandingOnAMoonWalkSquareDoesntAffectAPlayerThatHa
 	self generateDeterministicDiceCupWithSequences: #(#( 2 4 3 ) #( 2 4 3 )).
 	cards := OrderedCollection newFrom: {  OverloadCard new. SpeedCard new. AccelerationCard new. RedoCard new. RedoCard new. RepeatCard new }.
 	self generateDeterministicDeckWith: cards.
-	squares := OrderedCollection newFrom: { BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (JailedEffect new) . BoardSquare applying: (NoEffect new) . BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new) . BoardSquare applying: (MoonWalkEffect goingBack: 2) . BoardSquare applying: (AtomicBombEffect new). BoardSquare applying: (NoEffect new) }.
+	squares := OrderedCollection newFrom: { BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (JailedEffect new) . 	BoardSquare applying: (NoEffect new) . BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new) . BoardSquare applying: (MoonWalkEffect goingBack: 2) . BoardSquare applying: (AtomicBombEffect new). BoardSquare applying: 	(NoEffect new) }.
 	aBoard := Board having: squares requiring: 1 playingWith: deterministicDeck usedBy: players throwing: diceCup.
 	aGame := GameMandM playedOn: aBoard.
 	playerPositions := Dictionary newFrom: { ('Fran' -> 1). ('Martu' -> 1). ('Maia' -> 1) }.
@@ -1407,7 +1407,7 @@ GameTest >> test56AnotherPlayerLandingOnAnAtomicBombSquareDoesntAffectAPlayerTha
 	self generateDeterministicDiceCupWithSequences: #(#( 2 3 5 ) #( 2 3 4 )).
 	cards := OrderedCollection newFrom: {  OverloadCard new. SpeedCard new. AccelerationCard new. RedoCard new. RedoCard new. RepeatCard new }.
 	self generateDeterministicDeckWith: cards.
-	squares := OrderedCollection newFrom: { BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (JailedEffect new) . BoardSquare applying: (NoEffect new) . BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new) . BoardSquare applying: (MoonWalkEffect goingBack: 2) . BoardSquare applying: (AtomicBombEffect new). BoardSquare applying: (NoEffect new) }.
+	squares := OrderedCollection newFrom: { BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new). BoardSquare applying: (JailedEffect new) . 	BoardSquare applying: (NoEffect new) . BoardSquare applying: (NoEffect new). BoardSquare applying: (NoEffect new) . BoardSquare applying: (MoonWalkEffect goingBack: 2) . BoardSquare applying: (AtomicBombEffect new). BoardSquare applying: 	(NoEffect new) }.
 	aBoard := Board having: squares requiring: 1 playingWith: deterministicDeck usedBy: players throwing: diceCup.
 	aGame := GameMandM playedOn: aBoard.
 	playerPositions := Dictionary newFrom: { ('Fran' -> 1). ('Martu' -> 1). ('Maia' -> 1) }.
