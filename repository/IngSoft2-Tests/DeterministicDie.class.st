@@ -27,6 +27,11 @@ DeterministicDie >> initializeHaving: aSequence [
 	index := 1.
 ]
 
+{ #category : #accessing }
+DeterministicDie >> max [
+	^ sequence max.
+]
+
 { #category : #action }
 DeterministicDie >> throw [
 

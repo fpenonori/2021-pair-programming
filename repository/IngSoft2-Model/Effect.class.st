@@ -6,6 +6,6 @@ Class {
 
 { #category : #action }
 Effect >> applyOn: aBoard activatedBy: aPlayer [
-	self subclassResponsibility.
+	aBoard lockUp: aPlayer.
 	
 ]

@@ -6,7 +6,7 @@ Class {
 
 { #category : #action }
 AccelerationCard >> applyTo: aBoard directedTo: aTarget [
-	aBoard move: aTarget by: 1
+	^ 1.
 ]
 
 { #category : #converting }

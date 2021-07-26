@@ -10,8 +10,8 @@ Class {
 }
 
 { #category : #'instance creation' }
-GameMandM class >> playedOn: aBoard using: aDiceCup [
-	^self new initializePlayedOn: aBoard using: aDiceCup.
+GameMandM class >> playedOn: aBoard [
+	^self new initializePlayedOn: aBoard.
 ]
 
 { #category : #accessing }
@@ -30,9 +30,8 @@ GameMandM >> handOf: aPlayer [
 ]
 
 { #category : #initialization }
-GameMandM >> initializePlayedOn: aBoard using: aDiceCup [
+GameMandM >> initializePlayedOn: aBoard [
 	
-	diceCup := aDiceCup.
 	board := aBoard.
 	isFinished := false
 
@@ -51,12 +50,9 @@ GameMandM >> make: aPlay [
 
 { #category : #action }
 GameMandM >> nextTurn [
-
-	| resultOfThrow |
 	
 	self verifyItisFinished.
-	resultOfThrow := diceCup throw.
-	board nextPlayerThrows: resultOfThrow in: self
+	board nextPlayerThrowsIn: self
 ]
 
 { #category : #testing }

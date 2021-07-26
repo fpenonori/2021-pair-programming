@@ -6,5 +6,5 @@ Class {
 
 { #category : #action }
 DrawCardEffect >> applyOn: aBoard activatedBy: aPlayer [
-	aBoard dealsCardTo: aPlayer
+	(aBoard isLockedUp: aPlayer) ifFalse: [ aBoard dealsCardTo: aPlayer ].
 ]
